@@ -9,7 +9,7 @@
 // Execute `rustlings hint try_from_into` or use the `hint` watch subcommand for
 // a hint.
 
-use std::convert::{TryFrom, TryInto};
+use std::convert::{TryFrom,TryInto};
 
 #[derive(Debug, PartialEq)]
 struct Color {
@@ -27,8 +27,6 @@ enum IntoColorError {
     IntConversion,
 }
 
-// I AM NOT DONE
-
 // Your task is to complete this implementation and return an Ok result of inner
 // type Color. You need to create an implementation for a tuple of three
 // integers, an array of three integers, and a slice of integers.
@@ -41,6 +39,19 @@ enum IntoColorError {
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = IntoColorError;
     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        let (r,g,b) = tuple; 
+       
+        let r : u8 = r.try_into().map_err(|_| IntoColorError::IntConversion)?;
+        let g : u8 = g.try_into().map_err(|_| IntoColorError::IntConversion)?;
+        let b : u8 = b.try_into().map_err(|_| IntoColorError::IntConversion)?;
+
+        Ok( Color{
+                    red     : r ,
+                    green   : g ,
+                    blue    : b ,
+                }
+        )
+
     }
 }
 
@@ -48,6 +59,18 @@ impl TryFrom<(i16, i16, i16)> for Color {
 impl TryFrom<[i16; 3]> for Color {
     type Error = IntoColorError;
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        let [r,g,b] = arr;
+
+        let r : u8 = r.try_into().map_err(|_| IntoColorError::IntConversion)?;
+        let g : u8 = g.try_into().map_err(|_| IntoColorError::IntConversion)?;
+        let b : u8 = b.try_into().map_err(|_| IntoColorError::IntConversion)?;
+
+        Ok( Color{
+                    red     : r ,
+                    green   : g ,
+                    blue    : b ,
+                }
+        )
     }
 }
 
@@ -55,15 +78,30 @@ impl TryFrom<[i16; 3]> for Color {
 impl TryFrom<&[i16]> for Color {
     type Error = IntoColorError;
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        if slice.len() != 3 {
+            return Err (IntoColorError::BadLen);
+        }
+
+        let r : u8 = slice[0].try_into().map_err(|_| IntoColorError::IntConversion)?;
+        let g : u8 = slice[1].try_into().map_err(|_| IntoColorError::IntConversion)?;
+        let b : u8 = slice[2].try_into().map_err(|_| IntoColorError::IntConversion)?;
+
+        Ok( Color{
+                    red     : r ,
+                    green   : g ,
+                    blue    : b ,
+                }
+        )
     }
 }
+
 
 fn main() {
     // Use the `try_from` function
     let c1 = Color::try_from((183, 65, 14));
     println!("{:?}", c1);
 
-    // Since TryFrom is implemented for Color, we should be able to use TryInto
+    // Since TryFrom is implemented for Color, we should be able to use.try_into
     let c2: Result<Color, _> = [183, 65, 14].try_into();
     println!("{:?}", c2);
 
@@ -71,7 +109,7 @@ fn main() {
     // With slice we should use `try_from` function
     let c3 = Color::try_from(&v[..]);
     println!("{:?}", c3);
-    // or take slice within round brackets and use TryInto
+    // or take slice within round brackets and use.try_into
     let c4: Result<Color, _> = (&v[..]).try_into();
     println!("{:?}", c4);
 }
