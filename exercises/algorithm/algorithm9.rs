@@ -2,7 +2,6 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,7 +36,20 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.items.push(value);
+        self.count += 1;
+
+        let mut idx = self.count;
+        while idx > 1 {
+            let parent = self.parent_idx(idx);
+
+            if (self.comparator)(&self.items[idx],&self.items[parent]) {
+                self.items.swap(idx,parent);
+                idx = parent;
+            } else {
+                break;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -58,7 +70,14 @@ where
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
         //TODO
-		0
+        let (l,r) = (self.left_child_idx(idx),self.right_child_idx(idx));
+        if r > self.count {
+            l
+        } else if (self.comparator)(&self.items[l],&self.items[r]) {
+            l
+        } else {
+            r
+        }
     }
 }
 
@@ -85,7 +104,26 @@ where
 
     fn next(&mut self) -> Option<T> {
         //TODO
-		None
+        if self.is_empty() {
+            return None;
+        }
+
+        let mut top = self.items.swap_remove(1);
+        self.count -= 1;
+
+        let mut cur = 1;
+        while self.children_present(cur) {
+            let smallest = self.smallest_child_idx(cur);
+
+            if (self.comparator)(&self.items[smallest],&self.items[cur]) {
+                self.items.swap(cur,smallest);
+                cur = smallest;
+            } else {
+                break;
+            }
+        } 
+        
+        Some(top)
     }
 }
 
